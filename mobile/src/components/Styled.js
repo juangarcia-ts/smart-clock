@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { View } from "react-native";
-import { Content, Header, Button, Text, Fab } from "native-base";
+import { Header, Button, Text, Fab , List, ListItem} from "native-base";
 
 export const CustomHeader = styled(Header).attrs({
   noLeft: true,
@@ -31,3 +31,13 @@ export const AlarmCreateButton = styled(Fab).attrs({
 })`
   background-color: #5067ff;
 `;
+
+export const CustomList = styled(List)``;
+
+export const Item = styled(ListItem)``;
+
+export const AlarmInfo = styled(Text)`
+  font-size: 48px;
+  font-weight: bold;
+`;
+

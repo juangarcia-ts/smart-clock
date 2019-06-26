@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
+import { AppState } from "react-native";
 import { Text } from "native-base";
 import BluetoothSerial from "react-native-bluetooth-serial";
 import AlarmCreate from "../components/AlarmCreate";
 import DevicesList from "../components/DevicesList";
 import { BluetoothButton, LoadingText } from "../components/Styled";
 
-function Home() {
+function BluetoothConnection() {
   const [isFetching, showLoading] = useState(false);
   const [isBTEnabled, setBTStatus] = useState(null);
   const [pairedDevices, setPairedDevices] = useState([]);
   const [unpairedDevices, setUnpairedDevices] = useState([]);
 
   // Life Cycle Methods
-  useEffect(() => {
+  useEffect(() => {    
     BluetoothSerial.on("bluetoothEnabled", fetchDevices);
     BluetoothSerial.on("bluetoothDisabled", clearDevices);
+    AppState.addEventListener('change', handleAppStateChange);
 
     BluetoothSerial.isEnabled().then(isEnabled => {
       if (isEnabled) {
@@ -26,6 +28,12 @@ function Home() {
   }, []);
 
   // Helper Methods
+  const handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'active') {
+      fetchDevices();
+    }
+  };
+  
   const clearDevices = () => {
     setPairedDevices([]);
     setUnpairedDevices([]);
@@ -82,9 +90,8 @@ function Home() {
         separatorText={"Outros dispositivos"}
       />
       {isFetching && <LoadingText>Buscando dispositivos...</LoadingText>}
-      <AlarmCreate />
     </>
   );
 }
 
-export default Home;
+export default BluetoothConnection;
