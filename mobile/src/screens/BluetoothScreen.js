@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { AppState } from "react-native";
 import { Text } from "native-base";
 import BluetoothSerial from "react-native-bluetooth-serial";
-import AlarmCreate from "../components/AlarmCreate";
 import DevicesList from "../components/DevicesList";
-import { BluetoothButton, LoadingText } from "../components/Styled";
+import { CustomContainer, BluetoothButton, LoadingText } from "../components/Styled";
 
-function BluetoothConnection() {
+function BluetoothScreen() {
   const [isFetching, showLoading] = useState(false);
   const [isBTEnabled, setBTStatus] = useState(null);
   const [pairedDevices, setPairedDevices] = useState([]);
@@ -74,7 +73,7 @@ function BluetoothConnection() {
   }
 
   return (
-    <>
+    <CustomContainer>
       <BluetoothButton
         isEnabled={isBTEnabled}
         onPress={() => toggleBluetooth()}
@@ -90,8 +89,8 @@ function BluetoothConnection() {
         separatorText={"Outros dispositivos"}
       />
       {isFetching && <LoadingText>Buscando dispositivos...</LoadingText>}
-    </>
+    </CustomContainer>
   );
 }
 
-export default BluetoothConnection;
+export default BluetoothScreen;

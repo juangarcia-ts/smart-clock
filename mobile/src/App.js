@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Root,
   Container,
+  Content,
   Title,
   Text,
   Tabs,
@@ -9,13 +10,14 @@ import {
   TabHeading,
   Icon
 } from "native-base";
+import { View } from "react-native";
 import { CustomHeader } from "./components/Styled";
-import BluetoothConnection from "./screens/BluetoothConnection";
-import Alarms from "./screens/Alarms";
+import BluetoothScreen from "./screens/BluetoothScreen";
+import AlarmScreen from "./screens/AlarmScreen";
 
 function App() {
   const [currentTab, setTab] = useState(0);
-  const tabs = [    
+  const tabs = [
     { icon: "clock", name: "Alarmes" },
     { icon: "bluetooth", name: "Conexão" }
   ];
@@ -24,7 +26,7 @@ function App() {
     const tab = tabs[index];
 
     return (
-      <TabHeading>
+      <TabHeading style={{backgroundColor: '#000'}}> 
         <Icon name={tab.icon} />
         <Text>{tab.name}</Text>
       </TabHeading>
@@ -43,10 +45,10 @@ function App() {
           onChangeTab={({ i }) => setTab(i)}
         >
           <Tab heading={renderHeading(0)}>
-            <Alarms />
+            <AlarmScreen />
           </Tab>
           <Tab heading={renderHeading(1)}>
-            <BluetoothConnection />
+            <BluetoothScreen />
           </Tab>
         </Tabs>
       </Container>
