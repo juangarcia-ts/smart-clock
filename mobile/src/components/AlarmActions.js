@@ -39,19 +39,19 @@ function AlarmActions({ alarm, onUpdate }) {
 
   return (
     <AlarmButton active={isActive} onPress={() => toggleButtons(!isActive)}>
-      <Icon name="clock" />
+      <Icon name="alarm" style={{ color: "#212121", fontSize: 36 }} />
       <Button
-        style={{ backgroundColor: "#34A34F" }}
+        style={{ backgroundColor: "#03DAC5" }}
         onPress={() => openTimePicker()}
       >
-        <Icon name={alarm ? "create" : "add"} />
+        <Icon name={alarm ? "create" : "add"} style={{ color: "#212121", fontSize: 32 }} />
       </Button>
       {alarm && (
         <Button
-          style={{ backgroundColor: "red" }}
+          style={{ backgroundColor: "#03DAC5" }}
           onPress={() => removeAlarm()}
         >
-          <Icon name="trash" />
+          <Icon name="trash" style={{ color: "#212121", fontSize: 32 }} />
         </Button>
       )}
     </AlarmButton>

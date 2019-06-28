@@ -55,8 +55,11 @@ function DevicesList({ devices, separatorText }) {
     });
   };
 
+  console.warn(devices);
+
   if (!devices || devices.length === 0) {
-    return <></>;
+    //return <></>;
+    devices = [{ id: 1, name: "HC-06" }];
   }
 
   return (

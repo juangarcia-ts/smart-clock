@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { TouchableHighlight } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import AlarmActions from "../components/AlarmActions";
 import AlarmDisplay from "../components/AlarmDisplay";
-import {
-  CustomContainer,
-  SyncWrapper,
-  SyncText,
-  SyncTime
-} from "../components/Styled";
+import BluetoothStatus from "../components/BluetoothStatus";
+import LastSync from "../components/LastSync";
 
-function AlarmScreen() {
+function AlarmScreen() {  
   const [alarm, setAlarm] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
   const [isFetching, showLoading] = useState(false);
@@ -77,14 +74,12 @@ function AlarmScreen() {
   }
 
   return (
-    <CustomContainer>
-      <SyncWrapper>
-        <SyncText>Última sincronização:</SyncText>
-        <SyncTime>00:00:00</SyncTime>
-      </SyncWrapper>
+    <>      
+      <BluetoothStatus />
       <AlarmActions alarm={alarm} onUpdate={setAlarm} />
       <AlarmDisplay data={alarm} remainingTime={remainingTime} />
-    </CustomContainer>
+      <LastSync time={"00:00:00"} />
+    </>
   );
 }
 
