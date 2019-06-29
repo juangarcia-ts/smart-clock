@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Root,
-  Container,
-  Title,
-  TabHeading,
-  Icon
-} from "native-base";
+import { Root, Container, Title, TabHeading, Icon } from "native-base";
 import { CustomHeader, CustomContent } from "./components/Styled";
 import AlarmScreen from "./screens/AlarmScreen";
 
@@ -28,16 +22,14 @@ function App() {
   };
 
   return (
-    <Root>
-      <Container>
-        <CustomHeader>
-          <Title>S.M.A.R.T Clock</Title>
-        </CustomHeader>
-        <CustomContent>
-          <AlarmScreen />
-        </CustomContent>
-      </Container>
-    </Root>
+    <Container>
+      <CustomHeader>
+        <Title>S.M.A.R.T Clock</Title>
+      </CustomHeader>
+      <CustomContent>
+        <AlarmScreen />
+      </CustomContent>
+    </Container>
   );
 }
 

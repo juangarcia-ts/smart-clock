@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { TouchableHighlight } from "react-native";
+import BluetoothSerial from "react-native-bluetooth-serial";
 import AsyncStorage from "@react-native-community/async-storage";
 import AlarmActions from "../components/AlarmActions";
 import AlarmDisplay from "../components/AlarmDisplay";
 import BluetoothStatus from "../components/BluetoothStatus";
 import LastSync from "../components/LastSync";
 
-function AlarmScreen() {  
-  const [alarm, setAlarm] = useState(null);
+function AlarmScreen() {
+  const [isConnected, setStatus] = useState(false);
+  const [lastSync, setLastSync] = useState(null);
+  const [alarm, setAlarmState] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
   const [isFetching, showLoading] = useState(false);
 
   // Life Cycle Methods
   useEffect(() => {
-    fetchAlarms();
+    BluetoothSerial.isConnected().then(res => {
+      setStatus(res);
+
+      fetchAlarms();
+    });
   }, []);
 
   useEffect(() => {
@@ -21,6 +27,14 @@ function AlarmScreen() {
       calculateRemainingTime(alarm);
     }
   }, [alarm]);
+
+  const setAlarm = alarm => {
+    setAlarmState(alarm);
+
+    if (isConnected) {
+      syncToArduino();
+    }
+  };
 
   const fetchAlarms = () => {
     showLoading(true);
@@ -37,6 +51,12 @@ function AlarmScreen() {
 
       showLoading(false);
     });
+  };
+
+  const syncToArduino = alarm => {
+    BluetoothSerial.write("AT")
+      .then(() => setLastSync(new Date()))
+      .catch(err => console.warn(res));
   };
 
   const calculateRemainingTime = savedAlarm => {
@@ -74,11 +94,11 @@ function AlarmScreen() {
   }
 
   return (
-    <>      
-      <BluetoothStatus />
+    <>
+      <BluetoothStatus isConnected={isConnected} />
       <AlarmActions alarm={alarm} onUpdate={setAlarm} />
       <AlarmDisplay data={alarm} remainingTime={remainingTime} />
-      <LastSync time={"00:00:00"} />
+      <LastSync time={lastSync} />
     </>
   );
 }

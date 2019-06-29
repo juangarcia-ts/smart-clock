@@ -5,7 +5,7 @@ function LastSync({ time }) {
   return (
     <SyncWrapper>
       <SyncText>Última sincronização:</SyncText>
-      <SyncTime>00:00:00</SyncTime>
+      <SyncTime>{time || "--:--:--"}</SyncTime>
     </SyncWrapper>
   );
 }

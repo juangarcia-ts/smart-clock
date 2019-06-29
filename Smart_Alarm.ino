@@ -15,21 +15,26 @@
 #define INTERVALO_BUZINA  2000
 
 //Variáveis
-//SoftwareSerial BTserial(RX_PORT, TX_PORT);
+SoftwareSerial BTserial(RX_PORT, TX_PORT);
 SevSeg sevseg;
-RTC_DS3231 rtc;
+RTC_DS3231 rtc;  
+String command = "";
+//DateTime alarm = new DateTime();
+bool alarm = true;
+int pin = 0;
+int userPin = 0;
 
 void setup() {
   pinMode(POWER_LED, OUTPUT);
   pinMode(ALARM_LED, OUTPUT);
-  //pinMode(TOUCH_BUTTON, INPUT);
-
-  //BTserial.begin(9600);
+  
   Serial.begin(9600);   
   Serial.print("Sketch:   ");   
   Serial.println(__FILE__);
   Serial.print("Uploaded: ");   
   Serial.println(__DATE__);     
+
+  BTserial.begin(9600);
  
   if (!rtc.begin()) {
     Serial.println("DS3231 não encontrado");
@@ -51,47 +56,69 @@ void setup() {
 
 void loop() {    
   digitalWrite(POWER_LED, HIGH); 
-
-  displayTime();
-
-  //initializeBluetooth();  
   
-  //int isButtonPressed = digitalRead(TOUCH_BUTTON);
+  initializeBluetooth();  
   
-  //if (isButtonPressed == 1) {
-  //  digitalWrite(ALARM_LED, HIGH);
-  //} 
+  DateTime rctNow = rtc.now();
+
+  if (alarm != true) {    
+    displayPIN();
+    ringAlarm();
+
+    if (pin == userPin) {
+      alarm = false;      
+    }
+  } else {
+    displayTime(rctNow);
+  }     
 } 
 
-void displayTime() {
-  DateTime now = rtc.now();
-  int currentTime = (now.hour() * 100) + now.minute();  
+void initializeBluetooth() {
+  if (BTserial.available() > 0) 
+  {  
+    while(BTserial.available()) 
+    { 
+      command += (char)BTserial.read();  
+    }  
+     
+    readCommand(command); 
+  }  
+  
+  if (Serial.available())
+  {  
+    delay(10);  
+    Serial.write(Serial.read());  
+    BTserial.write(Serial.read());      
+  } 
+}
+
+void readCommand(String command) {
+  Serial.print(command);
+  
+  if (command.indexOf("SET_ALARM:") {
+    Serial.write("1");
+  } else if (command.indexOf("DISMISS_ALARM:") {
+    Serial.write("2");
+  }
+
+  command = "";
+}
+
+void displayTime(DateTime rtcNow) {
+  int currentTime = (rtcNow.hour() * 100) + rtcNow.minute();  
 
   sevseg.setNumber(currentTime, 2);
   sevseg.refreshDisplay(); 
 }
 
-//void initializeBluetooth() {  
-//  String command = "";
-//
-//  // Read device output if available.  
-//  if (BTserial.available() > 0) 
-//  {  
-//     while(BTserial.available()) 
-//     { // While there is more to be read, keep reading.  
-//       command += (char)BTserial.read();  
-//     }  
-//   Serial.println(command);  
-//   command = ""; // No repeats  
-//  }  
-//  
-//  // Read user input if available.  
-//  if (Serial.available())
-//  {  
-//    delay(10); // The DELAY!  
-//    BTserial.write(Serial.read());  
-//  } 
-//}
+void displayPIN() {
+  if (pin == 0) {
+    pin = random(1,9999);
+  }
+    
+  sevseg.setNumber(pin, 0);
+  sevseg.refreshDisplay(); 
+}
 
 void ringAlarm() {
   tone(BUZZER, NOTA_BUZINA, INTERVALO_BUZINA);  

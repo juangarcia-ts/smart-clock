@@ -1,18 +1,17 @@
 import styled from "styled-components";
-import { View, TouchableWithoutFeedback } from "react-native";
 import {
-  Header,
-  Content,
-  Button,
-  Text,
-  Fab,
-  List,
-  ListItem
-} from "native-base";
+  View,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  SectionList
+} from "react-native";
+import { Header, Content, Button, Text, Fab } from "native-base";
 
-export const CustomList = styled(List)``;
-
-export const Item = styled(ListItem)``;
+export const CenteredItem = styled(View)`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
 
 export const CustomHeader = styled(Header).attrs({
   noLeft: true,
@@ -122,7 +121,31 @@ export const TimeText = styled(Text)`
 export const ModalWrapper = styled(View)`
   background-color: #212121;
   flex: 1;
-  justify-content: center;
+`;
+
+export const DevicesWrapper = styled(View)`
+  flex: 1;
+  margin-top: 100px;
+  padding: 20px;
+`;
+
+export const List = styled(SectionList)``;
+
+export const ListItem = styled(View).attrs({
+  borderStyle: "solid",
+  borderColor: "#FFF"
+})``;
+
+export const ItemName = styled(Text)`
+  color: #fff;
+  padding: 10px 20px;
+  opacity: 0.75;
+`;
+
+export const ListSeparator = styled(Text)`
+  color: #fff;
+  font-size: 24px;
+  margin: 30px 0 10px;
 `;
 
 export const EnableButtonWrapper = styled(View)`
@@ -151,4 +174,19 @@ export const CloseButton = styled(Button).attrs({
   top: 20px;
   right: 20px;
   background-color: #03dac5;
+`;
+
+export const RefreshButton = styled(TouchableOpacity)`
+  position: absolute;
+  bottom: 20px;
+  flex-direction: row;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const RefreshText = styled(Text)`
+  margin-left: 10px;
+  color: #fff;
+  opacity: 0.75;
 `;

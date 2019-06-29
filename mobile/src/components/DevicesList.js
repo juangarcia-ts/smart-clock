@@ -1,28 +1,38 @@
 import React, { useState } from "react";
+import { TouchableOpacity } from "react-native";
 import BluetoothSerial from "react-native-bluetooth-serial";
+import { Icon, Toast, Spinner, Root } from "native-base";
 import {
-  Text,
-  Toast,
+  CenteredItem,
   List,
   ListItem,
-  Left,
-  Body,
-  Button,
-  Icon,
-  Spinner,
-  Separator
-} from "native-base";
+  ListSeparator,
+  ItemName,
+  RefreshButton,
+  RefreshText
+} from "./Styled";
 
-function DevicesList({ devices, separatorText }) {
+function DevicesList({
+  pairedDevices,
+  unpairedDevices,
+  onSuccessfulConnection,
+  onRefresh
+}) {
   const [isConnecting, showSpinner] = useState(false);
 
   const connectToDevice = device => {
+    let isSuccessful = false;
     let message = "";
 
     showSpinner(true);
 
     BluetoothSerial.connect(device.id)
-      .then(() => (message = `Conectado a ${device.name}`))
+      .then(() => {
+        isSuccessful = true;
+        message = `Conectado a ${device.name}`;
+
+        testConnection();
+      })
       .catch(err => (message = "Não foi possível se conectar ao dispositivo"))
       .finally(() => {
         showSpinner(false);
@@ -31,47 +41,66 @@ function DevicesList({ devices, separatorText }) {
           buttonText: "OK",
           duration: 3000
         });
+
+        if (isSuccessful) {
+          onSuccessfulConnection();
+        }
       });
   };
 
-  const renderDevices = () => {
-    return devices.map(device => {
-      return (
-        <ListItem
-          key={device.id}
-          icon
-          onPress={() => !isConnecting && connectToDevice(device)}
-        >
-          <Left>
-            <Button>
-              <Icon name="bluetooth" />
-            </Button>
-          </Left>
-          <Body>
-            <Text>{device.name || device.id}</Text>
-          </Body>
-        </ListItem>
-      );
-    });
+  const testConnection = () => {
+    BluetoothSerial.write("AT").catch(err => console.warn(res));
   };
 
-  console.warn(devices);
+  const renderDevices = (device, index) => {
+    return (
+      <ListItem
+        key={device.id}
+        borderTopWidth={index === 0 ? 1 : 0}
+        borderBottomWidth={1}
+      >
+        <TouchableOpacity
+          onPress={() => !isConnecting && connectToDevice(device)}
+        >
+          <ItemName>{device.name || device.id}</ItemName>
+        </TouchableOpacity>
+      </ListItem>
+    );
+  };
 
-  if (!devices || devices.length === 0) {
-    //return <></>;
-    devices = [{ id: 1, name: "HC-06" }];
+  if (
+    (!pairedDevices || pairedDevices.length === 0) &&
+    (!unpairedDevices || unpairedDevices.length === 0)
+  ) {
+    return <></>;
+  }
+
+  if (isConnecting) {
+    return (
+      <CenteredItem>
+        <Spinner color={"#03dac5"} size={"large"} />
+      </CenteredItem>
+    );
   }
 
   return (
-    <>
-      <List>
-        <Separator bordered>
-          <Text>{separatorText}</Text>
-        </Separator>
-        {renderDevices()}
-      </List>
-      {isConnecting && <Spinner />}
-    </>
+    <Root>
+      <List
+        sections={[
+          { title: "Dispositivos pareados", data: pairedDevices },
+          { title: "Outros dispositivos", data: unpairedDevices }
+        ]}
+        renderItem={({ item, index }) => renderDevices(item, index)}
+        renderSectionHeader={({ section }) => (
+          <ListSeparator>{section.title}</ListSeparator>
+        )}
+        keyExtractor={(item, index) => index}
+      />
+      <RefreshButton onPress={() => onRefresh()}>
+        <Icon name="refresh" style={{ color: "#FFF" }} />
+        <RefreshText>Buscar novamente</RefreshText>
+      </RefreshButton>
+    </Root>
   );
 }
 
