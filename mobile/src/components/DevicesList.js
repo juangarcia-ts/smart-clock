@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import BluetoothSerial from "react-native-bluetooth-serial";
-import { Icon, Toast, Spinner, Root } from "native-base";
+import { Icon, Toast, Spinner, Text, Root } from "native-base";
 import {
   CenteredItem,
+  AlarmInfo,
   List,
   ListItem,
   ListSeparator,
@@ -12,12 +13,7 @@ import {
   RefreshText
 } from "./Styled";
 
-function DevicesList({
-  pairedDevices,
-  unpairedDevices,
-  onSuccessfulConnection,
-  onRefresh
-}) {
+function DevicesList({ devices, onSuccessfulConnection, onRefresh }) {
   const [isConnecting, showSpinner] = useState(false);
 
   const connectToDevice = device => {
@@ -30,8 +26,6 @@ function DevicesList({
       .then(() => {
         isSuccessful = true;
         message = `Conectado a ${device.name}`;
-
-        testConnection();
       })
       .catch(err => (message = "Não foi possível se conectar ao dispositivo"))
       .finally(() => {
@@ -43,13 +37,9 @@ function DevicesList({
         });
 
         if (isSuccessful) {
-          onSuccessfulConnection();
+          onSuccessfulConnection(false);
         }
       });
-  };
-
-  const testConnection = () => {
-    BluetoothSerial.write("AT").catch(err => console.warn(res));
   };
 
   const renderDevices = (device, index) => {
@@ -68,11 +58,18 @@ function DevicesList({
     );
   };
 
-  if (
-    (!pairedDevices || pairedDevices.length === 0) &&
-    (!unpairedDevices || unpairedDevices.length === 0)
-  ) {
-    return <></>;
+  if (!devices || devices.length === 0) {
+    return (
+      <>
+        <CenteredItem>
+          <AlarmInfo>Não há dispositivos disponíveis</AlarmInfo>
+        </CenteredItem>
+        <RefreshButton onPress={() => onRefresh()}>
+          <Icon name="refresh" style={{ color: "#FFF" }} />
+          <RefreshText>Buscar novamente</RefreshText>
+        </RefreshButton>
+      </>
+    );
   }
 
   if (isConnecting) {
@@ -86,10 +83,7 @@ function DevicesList({
   return (
     <Root>
       <List
-        sections={[
-          { title: "Dispositivos pareados", data: pairedDevices },
-          { title: "Outros dispositivos", data: unpairedDevices }
-        ]}
+        sections={[{ title: "Dispositivos disponíveis", data: devices }]}
         renderItem={({ item, index }) => renderDevices(item, index)}
         renderSectionHeader={({ section }) => (
           <ListSeparator>{section.title}</ListSeparator>

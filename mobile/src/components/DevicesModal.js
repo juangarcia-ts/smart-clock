@@ -15,11 +15,10 @@ import {
   AlarmInfo
 } from "./Styled";
 
-function DevicesModal({ isVisible, toggleFunction }) {
+function DevicesModal({ isVisible, toggleFunction, onConnection }) {
   const [isFetching, showLoading] = useState(false);
   const [isBTEnabled, setBTStatus] = useState(null);
-  const [pairedDevices, setPairedDevices] = useState([]);
-  const [unpairedDevices, setUnpairedDevices] = useState([]);
+  const [devices, setDevices] = useState([]);
 
   useEffect(() => {
     BluetoothSerial.isEnabled().then(isEnabled => {
@@ -32,8 +31,7 @@ function DevicesModal({ isVisible, toggleFunction }) {
   }, []);
 
   const clearDevices = () => {
-    setPairedDevices([]);
-    setUnpairedDevices([]);
+    setDevices([]);
   };
 
   const toggleBluetooth = () => {
@@ -44,13 +42,16 @@ function DevicesModal({ isVisible, toggleFunction }) {
     });
   };
 
-  const fetchDevices = () => {
-    BluetoothSerial.list().then(devicesList => setPairedDevices(devicesList));
+  const onSuccessfulConnection = () => {
+    toggleFunction(false);
+    onConnection();
+  };
 
+  const fetchDevices = () => {
     showLoading(true);
 
     BluetoothSerial.discoverUnpairedDevices()
-      .then(devicesList => setUnpairedDevices(devicesList))
+      .then(devicesList => setDevices(devicesList))
       .catch(err =>
         Toast.show({
           text: "Não foi possível localizar os dispositivos",
@@ -74,9 +75,8 @@ function DevicesModal({ isVisible, toggleFunction }) {
         {isBTEnabled && !isFetching ? (
           <DevicesWrapper>
             <DevicesList
-              pairedDevices={pairedDevices}
-              unpairedDevices={unpairedDevices}
-              onSuccessfulConnection={toggleFunction}
+              devices={devices}
+              onSuccessfulConnection={onSuccessfulConnection}
               onRefresh={fetchDevices}
             />
           </DevicesWrapper>

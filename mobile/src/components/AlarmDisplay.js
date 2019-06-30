@@ -23,9 +23,10 @@ function AlarmDisplay({ data, remainingTime }) {
       <AlarmTitle>Próximo alarme</AlarmTitle>
       <TimeWrapper>
         <TimeText hour>{data.hour}:</TimeText>
-        <TimeText>{data.minute < 10 ? `0${data.minute}` : data.minute}</TimeText>
+        <TimeText>
+          {data.minute < 10 ? `0${data.minute}` : data.minute}
+        </TimeText>
       </TimeWrapper>
-      <AlarmInfo>Restam {remainingTime} até o alarme</AlarmInfo>
     </AlarmWrapper>
   );
 }

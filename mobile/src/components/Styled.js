@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   SectionList
 } from "react-native";
-import { Header, Content, Button, Text, Fab } from "native-base";
+import { Header, Content, Button, Text, Fab, Input } from "native-base";
 
 export const CenteredItem = styled(View)`
   flex: 1;
@@ -123,9 +123,16 @@ export const ModalWrapper = styled(View)`
   flex: 1;
 `;
 
+export const DeactivateWrapper = styled(View)`
+  background-color: #212121;
+  flex: 1;
+  padding: 50px;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const DevicesWrapper = styled(View)`
   flex: 1;
-  margin-top: 100px;
   padding: 20px;
 `;
 
@@ -145,7 +152,7 @@ export const ItemName = styled(Text)`
 export const ListSeparator = styled(Text)`
   color: #fff;
   font-size: 24px;
-  margin: 30px 0 10px;
+  margin: 130px 0 0;
 `;
 
 export const EnableButtonWrapper = styled(View)`
@@ -189,4 +196,30 @@ export const RefreshText = styled(Text)`
   margin-left: 10px;
   color: #fff;
   opacity: 0.75;
+`;
+
+export const DeactivateTitle = styled(Text)`
+  color: #fff;
+  opacity: 0.75;
+  font-weight: bold;
+  font-size: 48px;
+`;
+
+export const DeactivateButton = styled(Button)`
+  align-self: center;
+  margin-top: 30px;
+  background-color: #03dac5;
+`;
+
+export const ButtonText = styled(Text)`
+  color: #212121;
+`;
+
+export const DeactivateInput = styled(Input).attrs({
+  keyboardType: "numeric",
+  maxLength: 4
+})`
+  color: #fff;
+  opacity: 0.75;
+  text-align: center;
 `;

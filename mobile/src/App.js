@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Root, Container, Title, TabHeading, Icon } from "native-base";
+import { Container, Title, TabHeading, Icon } from "native-base";
 import { CustomHeader, CustomContent } from "./components/Styled";
 import AlarmScreen from "./screens/AlarmScreen";
 
 function App() {
+  //console.disableYellowBox = true;
   const [currentTab, setTab] = useState(0);
   const tabs = [
     { icon: "clock", name: "Alarmes" },

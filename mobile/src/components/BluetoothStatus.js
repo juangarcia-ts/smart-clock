@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DevicesModal from "./DevicesModal";
+import BluetoothSerial from "react-native-bluetooth-serial";
 import {
   ConnectionWrapper,
   ConnectionStatus,
@@ -7,14 +8,18 @@ import {
   ConnectionText
 } from "./Styled";
 
-function BluetoothStatus({ isConnected }) {
+function BluetoothStatus({ isConnected, onConnection }) {
   const [isModalOpen, toggleDevicesModal] = useState(false);
+
+  const openModal = async () => {
+    BluetoothSerial.disconnect().finally(() => toggleDevicesModal(true));
+  };
 
   return (
     <>
       <ConnectionWrapper>
         <ConnectionStatus isConnected={isConnected} />
-        <ConnectionButton onPress={() => toggleDevicesModal(!isModalOpen)}>
+        <ConnectionButton onPress={() => openModal()}>
           <ConnectionText>
             {isConnected ? "Conectado" : "Não conectado"}
           </ConnectionText>
@@ -23,6 +28,7 @@ function BluetoothStatus({ isConnected }) {
       <DevicesModal
         isVisible={isModalOpen}
         toggleFunction={toggleDevicesModal}
+        onConnection={onConnection}
       />
     </>
   );

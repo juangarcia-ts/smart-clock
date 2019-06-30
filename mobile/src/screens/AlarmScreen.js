@@ -1,20 +1,36 @@
 import React, { useState, useEffect } from "react";
+import { Root } from "native-base";
 import BluetoothSerial from "react-native-bluetooth-serial";
 import AsyncStorage from "@react-native-community/async-storage";
 import AlarmActions from "../components/AlarmActions";
 import AlarmDisplay from "../components/AlarmDisplay";
 import BluetoothStatus from "../components/BluetoothStatus";
 import LastSync from "../components/LastSync";
+import DeactivationModal from "../components/DeactivationModal";
 
 function AlarmScreen() {
+  const [isOn, showDeactivation] = useState(false);
+  const [hasPinError, showError] = useState(null);
   const [isConnected, setStatus] = useState(false);
   const [lastSync, setLastSync] = useState(null);
   const [alarm, setAlarmState] = useState(null);
-  const [remainingTime, setRemainingTime] = useState(null);
   const [isFetching, showLoading] = useState(false);
 
   // Life Cycle Methods
   useEffect(() => {
+    BluetoothSerial.withDelimiter("\r\n").then(() => {
+      BluetoothSerial.on("read", ({ data }) => {
+        if (data == "ALARM_ON\r\n" && !isOn) {
+          showDeactivation(true);
+        } else if (data == "ALARM_OFF\r\n" && isOn) {
+          showDeactivation(false);
+          showError(false);
+        } else if (data == "WRONG_PIN\r\n" && !hasPinError) {
+          showError(true);
+        }
+      });
+    });
+
     BluetoothSerial.isConnected().then(res => {
       setStatus(res);
 
@@ -22,18 +38,28 @@ function AlarmScreen() {
     });
   }, []);
 
-  useEffect(() => {
+  const onConnection = () => {
+    setStatus(true);
+
     if (alarm) {
-      calculateRemainingTime(alarm);
+      syncToArduino(alarm);
     }
-  }, [alarm]);
+  };
 
-  const setAlarm = alarm => {
-    setAlarmState(alarm);
+  const setAlarm = myAlarm => {
+    setAlarmState(myAlarm);
 
-    if (isConnected) {
-      syncToArduino();
+    if (myAlarm && isConnected) {
+      syncToArduino(myAlarm);
     }
+  };
+
+  const syncToArduino = ({ hour, minute }) => {
+    const command = `SET:${hour.toString()}${minute.toString()}`;
+
+    BluetoothSerial.write(command)
+      .then(() => setLastSync(new Date()))
+      .catch(err => console.warn(res));
   };
 
   const fetchAlarms = () => {
@@ -44,48 +70,10 @@ function AlarmScreen() {
 
       if (savedAlarm) {
         setAlarm(savedAlarm);
-
-        calculateRemainingTime(savedAlarm);
-        setTimeout(() => calculateRemainingTime(savedAlarm), 60000);
       }
 
       showLoading(false);
     });
-  };
-
-  const syncToArduino = alarm => {
-    BluetoothSerial.write("AT")
-      .then(() => setLastSync(new Date()))
-      .catch(err => console.warn(res));
-  };
-
-  const calculateRemainingTime = savedAlarm => {
-    const convertToHHMM = secs => {
-      function z(n) {
-        return (n < 10 ? "0" : "") + n;
-      }
-      var sign = secs < 0 ? "-" : "";
-      secs = Math.abs(secs);
-      return sign + z((secs / 3600) | 0) + ":" + z(((secs % 3600) / 60) | 0);
-    };
-
-    const alarmDate = new Date();
-    alarmDate.setHours(savedAlarm.hour);
-    alarmDate.setMinutes(savedAlarm.minute);
-
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-
-    let secondsDifference = (alarmDate - now) / 1000;
-
-    if (secondsDifference < 0) {
-      secondsDifference = 24 * 60 * 60 + secondsDifference;
-    }
-
-    const timeBetween = convertToHHMM(secondsDifference);
-
-    setRemainingTime(timeBetween);
   };
 
   // Render Methods
@@ -94,12 +82,13 @@ function AlarmScreen() {
   }
 
   return (
-    <>
-      <BluetoothStatus isConnected={isConnected} />
+    <Root>
+      <BluetoothStatus isConnected={isConnected} onConnection={onConnection} />
       <AlarmActions alarm={alarm} onUpdate={setAlarm} />
-      <AlarmDisplay data={alarm} remainingTime={remainingTime} />
+      <AlarmDisplay data={alarm} />
       <LastSync time={lastSync} />
-    </>
+      <DeactivationModal isVisible={isOn} hasError={hasPinError} />
+    </Root>
   );
 }
 
