@@ -10,8 +10,8 @@
 #define BUZZER            17
 #define POWER_LED         16
 #define ALARM_LED         19
-#define NOTA_BUZINA       262
-#define INTERVALO_BUZINA  2000
+#define NOTA_BUZINA       2093
+#define INTERVALO_BUZINA  10000
 #define RTC_DELAY         4
 
 //Variáveis
@@ -35,7 +35,7 @@ void setup() {
 
   BTserial.begin(9600);
 
-  randomSeed(9000);
+  randomSeed(9600);
 
   if (!rtc.begin()) {
     Serial.println("DS3231 não encontrado");
@@ -45,11 +45,11 @@ void setup() {
   byte hardwareConfig = COMMON_CATHODE;
   byte numDigits = 4;
   byte digitPins[] = {9, 10, 11, 12};
-  byte segmentPins[] = {2, 3, 4, 5, 6, 7, 8};
+  byte segmentPins[] = {2, 3, 4, 5, 6, 7, 8, 13};
   bool resistorsOnSegments = true;
   bool updateWithDelays = false;
   bool leadingZeros = true;
-  bool disableDecPoint = true;
+  bool disableDecPoint = false;
 
   sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments, updateWithDelays, leadingZeros, disableDecPoint);
   sevseg.setBrightness(90);
@@ -59,11 +59,15 @@ void loop() {
   DateTime rtcNow = rtc.now();
   String strNow = String(rtcNow.hour()) + String(rtcNow.minute() - RTC_DELAY);
       
-  if (isActive || (hasAlarm == true && alarmTime.equals(strNow))) {
+  if (hasAlarm == true && isActive == false && alarmTime.equals(strNow)) {
     BTserial.write("ALARM_ON\r\n");     
-    digitalWrite(POWER_LED, HIGH); 
-    displayPIN();
+    isActive = true;
+  }
+
+  if (isActive == true) {
+    toggleLed(HIGH);  
     ringAlarm();
+    displayPIN();
   } else {
     displayTime(rtcNow);
   }
@@ -90,9 +94,12 @@ void startBluetooth() {
       if (pin != userPin) {
         BTserial.write("WRONG_PIN\r\n"); 
       } else {
+        BTserial.write("ALARM_OFF\r\n"); 
+        toggleLed(LOW);      
         hasAlarm = false;
         isActive = false;
-        BTserial.write("ALARM_OFF\r\n"); 
+        alarmTime = "";
+        pin = 0;
       }
     }
   }
@@ -123,4 +130,8 @@ void displayPIN() {
 void ringAlarm() {
   tone(BUZZER, NOTA_BUZINA, INTERVALO_BUZINA);
   noTone(BUZZER);
+}
+
+void toggleLed(int ledStatus) {
+  digitalWrite(POWER_LED, ledStatus);   
 }
