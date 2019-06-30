@@ -45,11 +45,11 @@ void setup() {
   byte hardwareConfig = COMMON_CATHODE;
   byte numDigits = 4;
   byte digitPins[] = {9, 10, 11, 12};
-  byte segmentPins[] = {2, 3, 4, 5, 6, 7, 8, 13};
+  byte segmentPins[] = {2, 3, 4, 5, 6, 7, 8};
   bool resistorsOnSegments = true;
   bool updateWithDelays = false;
   bool leadingZeros = true;
-  bool disableDecPoint = false;
+  bool disableDecPoint = true;
 
   sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments, updateWithDelays, leadingZeros, disableDecPoint);
   sevseg.setBrightness(90);
