@@ -15,7 +15,6 @@ export const CenteredItem = styled(View)`
 
 export const CustomHeader = styled(Header).attrs({
   noLeft: true,
-  iosBarStyle: "light-content",
   androidStatusBarColor: "#000"
 })`
   align-items: center;
@@ -101,7 +100,7 @@ export const SyncTime = styled(Text)`
 `;
 
 export const AlarmWrapper = styled(View)`
-  flex: 1;
+  flex: 0.9;
   justify-content: center;
   align-items: center;
 `;
@@ -219,7 +218,7 @@ export const DeactivateInput = styled(Input).attrs({
   keyboardType: "numeric",
   maxLength: 4
 })`
-  color: #fff;
+  color: ${props => (props.hasError ? "#bf0000" : "#fff")};
   opacity: 0.75;
   text-align: center;
 `;

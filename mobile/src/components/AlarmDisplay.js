@@ -8,7 +8,7 @@ import {
   AlarmInfo
 } from "./Styled";
 
-function AlarmDisplay({ data, remainingTime }) {
+function AlarmDisplay({ data }) {
   if (!data) {
     return (
       <AlarmWrapper>

@@ -9,7 +9,7 @@ import LastSync from "../components/LastSync";
 import DeactivationModal from "../components/DeactivationModal";
 
 function AlarmScreen() {
-  const [isOn, showDeactivation] = useState(false);
+  const [isActive, showDeactivation] = useState(false);
   const [hasPinError, showError] = useState(null);
   const [isConnected, setStatus] = useState(false);
   const [lastSync, setLastSync] = useState(null);
@@ -20,12 +20,17 @@ function AlarmScreen() {
   useEffect(() => {
     BluetoothSerial.withDelimiter("\r\n").then(() => {
       BluetoothSerial.on("read", ({ data }) => {
-        if (data == "ALARM_ON\r\n" && !isOn) {
+        if (data == "ALARM_ON\r\n") {
           showDeactivation(true);
-        } else if (data == "ALARM_OFF\r\n" && isOn) {
+        }
+
+        if (data == "ALARM_OFF\r\n") {
           showDeactivation(false);
           showError(false);
-        } else if (data == "WRONG_PIN\r\n" && !hasPinError) {
+          finishAlarm();
+        }
+
+        if (data == "WRONG_PIN\r\n") {
           showError(true);
         }
       });
@@ -44,6 +49,11 @@ function AlarmScreen() {
     if (alarm) {
       syncToArduino(alarm);
     }
+  };
+
+  const finishAlarm = () => {
+    AsyncStorage.setItem("alarm", JSON.stringify(null));
+    setAlarmState(null);
   };
 
   const setAlarm = myAlarm => {
@@ -87,7 +97,7 @@ function AlarmScreen() {
       <AlarmActions alarm={alarm} onUpdate={setAlarm} />
       <AlarmDisplay data={alarm} />
       <LastSync time={lastSync} />
-      <DeactivationModal isVisible={isOn} hasError={hasPinError} />
+      <DeactivationModal isVisible={isActive} hasError={hasPinError} />
     </Root>
   );
 }
